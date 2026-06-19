@@ -223,13 +223,41 @@ main {
 .output-body {
   padding: 24px 28px;
   font-size: 14px; line-height: 2.0;
-  white-space: pre-wrap; color: var(--text);
+  color: var(--text);
   min-height: 100px; max-height: 900px;
   overflow-y: auto; background: var(--surface);
   font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   word-break: keep-all;
   letter-spacing: 0.01em;
+  white-space: pre-wrap;
 }
+.output-body.error { color: var(--red); background: var(--red-light); white-space: pre-wrap; }
+.doc-section { margin-bottom: 28px; }
+.doc-section-title {
+  font-size: 15px; font-weight: 700;
+  color: var(--blue); border-bottom: 2px solid var(--blue-light);
+  padding-bottom: 6px; margin-bottom: 14px;
+  letter-spacing: -0.2px;
+}
+.doc-para { margin-bottom: 12px; line-height: 2.0; white-space: pre-wrap; }
+.result-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+.result-table th {
+  background: var(--surface2); padding: 10px 14px;
+  border: 1px solid var(--border); font-weight: 600;
+  text-align: left; color: var(--text2); font-size: 12px;
+}
+.result-table td { padding: 10px 14px; border: 1px solid var(--border); vertical-align: middle; line-height: 1.6; }
+.result-table tr:hover td { background: var(--surface2); }
+.badge-ok   { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:#e6f4ed;color:#1a7a4a;font-size:12px;font-weight:700; }
+.badge-cond { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:#fef3e2;color:#92600a;font-size:12px;font-weight:700; }
+.badge-no   { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:#fef2f2;color:#b91c1c;font-size:12px;font-weight:700; }
+.final-opinion {
+  background: var(--blue-light); border-left: 4px solid var(--blue);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 14px 18px; margin-top: 16px;
+  font-size: 13px; line-height: 1.85; white-space: pre-wrap;
+}
+.final-opinion-title { font-weight: 700; color: var(--blue); margin-bottom: 6px; font-size: 13px; }
 .output-body.error { color: var(--red); background: var(--red-light); }
 .cursor {
   display: inline-block; width: 2px; height: 14px;
@@ -491,6 +519,111 @@ function dlOutput() {
   showToast('✓ 파일 다운로드 시작');
 }
 
+function renderOutput(container) {
+  const raw = container.textContent;
+  container.textContent = '';
+  container.style.whiteSpace = 'normal';
+
+  // 종합결론 블록 분리
+  const summaryMarker = '=== 종합 검토 결론 ===';
+  const finalMarker = '◆ 최종 의견';
+  let mainText = raw;
+  let summaryText = '';
+  let finalText = '';
+
+  const sumIdx = raw.indexOf(summaryMarker);
+  if (sumIdx !== -1) {
+    mainText = raw.slice(0, sumIdx).trimEnd();
+    const afterSum = raw.slice(sumIdx + summaryMarker.length);
+    const finalIdx = afterSum.indexOf(finalMarker);
+    if (finalIdx !== -1) {
+      summaryText = afterSum.slice(0, finalIdx).trim();
+      finalText = afterSum.slice(finalIdx + finalMarker.length).trim();
+    } else {
+      summaryText = afterSum.trim();
+    }
+  }
+
+  // 본문 렌더링
+  const sections = mainText.split(/(?=\n[0-9]+\.\s)/);
+  sections.forEach(sec => {
+    const trimmed = sec.trim();
+    if (!trimmed) return;
+    const titleMatch = trimmed.match(/^([0-9]+\.\s[^\n]+)/);
+    if (titleMatch) {
+      const div = document.createElement('div');
+      div.className = 'doc-section';
+      const titleEl = document.createElement('div');
+      titleEl.className = 'doc-section-title';
+      titleEl.textContent = titleMatch[1].trim();
+      div.appendChild(titleEl);
+      const body = document.createElement('div');
+      body.className = 'doc-para';
+      body.textContent = trimmed.slice(titleMatch[1].length).trim();
+      div.appendChild(body);
+      container.appendChild(div);
+    } else {
+      const p = document.createElement('div');
+      p.className = 'doc-para';
+      p.textContent = trimmed;
+      container.appendChild(p);
+    }
+  });
+
+  // 종합결론 표 렌더링
+  if (summaryText) {
+    const secDiv = document.createElement('div');
+    secDiv.className = 'doc-section';
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'doc-section-title';
+    titleEl.textContent = '4. 종합 검토 결론';
+    secDiv.appendChild(titleEl);
+
+    const table = document.createElement('table');
+    table.className = 'result-table';
+    table.innerHTML = '<thead><tr><th>용도</th><th>허용 여부</th><th>근거</th><th>조건</th></tr></thead>';
+    const tbody = document.createElement('tbody');
+
+    const entries = summaryText.split(/\n(?=\[)/);
+    entries.forEach(entry => {
+      const lines = entry.trim().split('\n');
+      if (!lines[0]) return;
+      const typeMatch = lines[0].match(/^\[(허용|조건부허용|불허)\]\s*(.*)/);
+      if (!typeMatch) return;
+      const type = typeMatch[1];
+      const name = typeMatch[2].trim();
+      let basis = '', cond = '';
+      lines.forEach(l => {
+        if (l.includes('근거:')) basis = l.replace('근거:', '').trim();
+        if (l.includes('조건:')) cond = l.replace('조건:', '').trim();
+      });
+      const badgeClass = type === '허용' ? 'badge-ok' : type === '조건부허용' ? 'badge-cond' : 'badge-no';
+      const icon = type === '허용' ? '✅' : type === '조건부허용' ? '🔶' : '❌';
+      const tr = document.createElement('tr');
+      tr.innerHTML = \`<td>\${name}</td><td><span class="\${badgeClass}">\${icon} \${type}</span></td><td>\${basis}</td><td>\${cond}</td>\`;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    secDiv.appendChild(table);
+    container.appendChild(secDiv);
+  }
+
+  // 최종 의견 블록
+  if (finalText) {
+    const opinDiv = document.createElement('div');
+    opinDiv.className = 'final-opinion';
+    const opinTitle = document.createElement('div');
+    opinTitle.className = 'final-opinion-title';
+    opinTitle.textContent = '◆ 최종 의견';
+    opinDiv.appendChild(opinTitle);
+    const opinBody = document.createElement('div');
+    opinBody.textContent = finalText;
+    opinDiv.appendChild(opinBody);
+    container.appendChild(opinDiv);
+  }
+}
+
 async function generate() {
   if (busy) return;
   busy = true;
@@ -560,6 +693,7 @@ async function generate() {
       }
     }
     cursor.remove();
+    renderOutput(body);
     showToast('✓ 검토서 초안 생성 완료');
 
   } catch (e) {
