@@ -263,7 +263,7 @@ main {
   <span class="logo-text">도시계획 검토서</span>
   <span class="logo-sub">작성 도구</span>
   <div class="header-spacer"></div>
-  <div class="powered">Powered by <span>Claude AI</span></div>
+  <div class="powered">Powered by <span>Groq AI</span></div>
 </header>
 
 <div class="layout">
@@ -389,7 +389,7 @@ main {
     <div class="ai-card">
       <div class="ai-header">
         <div class="ai-header-title">AI 초안 생성</div>
-        <div class="ai-badge">Claude AI</div>
+        <div class="ai-badge">Groq AI</div>
         <div style="flex:1"></div>
         <button class="small-btn" onclick="clearAll()">
           <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>초기화
@@ -547,8 +547,8 @@ async function generate() {
         if (!raw || raw === '[DONE]') continue;
         try {
           const parsed = JSON.parse(raw);
-          // Gemini SSE 포맷: candidates[0].content.parts[0].text
-          const txt = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
+          // OpenAI 호환(Groq) SSE 포맷
+          const txt = parsed?.choices?.[0]?.delta?.content;
           if (txt) {
             body.insertBefore(document.createTextNode(txt), cursor);
             body.scrollTop = body.scrollHeight;
