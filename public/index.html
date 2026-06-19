@@ -221,11 +221,14 @@ main {
 .progress-fill { height: 100%; background: var(--blue); animation: prog 2.5s ease-in-out infinite; }
 @keyframes prog { 0%{width:0%} 70%{width:85%} 100%{width:95%} }
 .output-body {
-  padding: 20px;
-  font-size: 13px; line-height: 1.9;
+  padding: 24px 28px;
+  font-size: 14px; line-height: 2.0;
   white-space: pre-wrap; color: var(--text);
-  min-height: 100px; max-height: 620px;
+  min-height: 100px; max-height: 900px;
   overflow-y: auto; background: var(--surface);
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  word-break: keep-all;
+  letter-spacing: 0.01em;
 }
 .output-body.error { color: var(--red); background: var(--red-light); }
 .cursor {
