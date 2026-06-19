@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>도시계획 검토서 작성 도구</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --surface2: #f2f1ee;
+  --border: #e2e0db;
+  --border2: #cccac4;
+  --text: #1a1917;
+  --text2: #6b6860;
+  --text3: #9e9c97;
+  --blue: #1a56a0;
+  --blue-light: #e8f0fb;
+  --blue-mid: #3b74c4;
+  --green: #1a7a4a;
+  --green-light: #e6f4ed;
+  --red: #b91c1c;
+  --red-light: #fef2f2;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+body {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 0 var(--border);
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--blue);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.logo-mark svg { width: 17px; height: 17px; fill: white; }
+.logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+.logo-sub { font-size: 12px; color: var(--text3); margin-left: 2px; }
+.header-spacer { flex: 1; }
+.powered { font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+.powered span { color: var(--blue); font-weight: 600; }
+
+.layout { display: grid; grid-template-columns: 210px 1fr; min-height: calc(100vh - 56px); }
+
+aside {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 18px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.side-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text3);
+  padding: 0 8px; margin: 10px 0 4px;
+}
+.side-label:first-child { margin-top: 0; }
+.doc-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 10px;
+  border-radius: var(--radius);
+  border: none; background: none;
+  font-size: 13px; color: var(--text2);
+  cursor: pointer; width: 100%; text-align: left;
+  transition: background 0.12s, color 0.12s;
+}
+.doc-btn:hover { background: var(--bg); color: var(--text); }
+.doc-btn.active { background: var(--blue-light); color: var(--blue); font-weight: 600; }
+.doc-btn svg { width: 15px; height: 15px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+main {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 860px;
+}
+
+.page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+.page-sub { font-size: 13px; color: var(--text2); margin-top: 3px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--text3);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+.card-title svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.full { grid-column: 1 / -1; }
+
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 12px; color: var(--text2); font-weight: 500; }
+.field input, .field select, .field textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  background: var(--surface2);
+  font-size: 13px; font-family: inherit;
+  color: var(--text); outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--blue-mid);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(59,116,196,0.10);
+}
+.field textarea { resize: vertical; line-height: 1.6; }
+.field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239e9c97' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+}
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.tag {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer; transition: all 0.12s;
+}
+.tag:hover { border-color: var(--blue-mid); color: var(--blue); background: var(--blue-light); }
+
+.ai-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.ai-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.ai-header-title { font-size: 14px; font-weight: 700; }
+.ai-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 8px;
+  border-radius: 20px; background: var(--blue); color: white;
+}
+.ai-body { padding: 16px 20px; }
+.extra-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px; }
+.extra-row textarea { flex: 1; min-height: 52px; }
+
+.gen-btn {
+  padding: 0 22px; height: 52px;
+  background: var(--blue); color: white;
+  border: none; border-radius: var(--radius);
+  font-size: 14px; font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  white-space: nowrap; flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+}
+.gen-btn:hover { background: #1044a0; }
+.gen-btn:active { transform: scale(0.98); }
+.gen-btn:disabled { background: var(--border2); cursor: not-allowed; transform: none; }
+.gen-btn svg { width: 15px; height: 15px; stroke: white; fill: none; stroke-width: 2.2; }
+
+.small-btn {
+  padding: 5px 10px; border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--surface); color: var(--text2);
+  font-size: 12px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: background 0.12s;
+}
+.small-btn:hover { background: var(--bg); color: var(--text); }
+.small-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+.output-wrap {
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: none;
+}
+.output-toolbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.output-label { font-size: 12px; font-weight: 600; color: var(--text2); flex: 1; display: flex; align-items: center; gap: 5px; }
+.output-label svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+.progress-bar { height: 3px; background: var(--blue-light); display: none; }
+.progress-fill { height: 100%; background: var(--blue); animation: prog 2.5s ease-in-out infinite; }
+@keyframes prog { 0%{width:0%} 70%{width:85%} 100%{width:95%} }
+.output-body {
+  padding: 20px;
+  font-size: 13px; line-height: 1.9;
+  white-space: pre-wrap; color: var(--text);
+  min-height: 100px; max-height: 620px;
+  overflow-y: auto; background: var(--surface);
+}
+.output-body.error { color: var(--red); background: var(--red-light); }
+.cursor {
+  display: inline-block; width: 2px; height: 14px;
+  background: var(--blue); margin-left: 2px; vertical-align: middle;
+  animation: blink 0.8s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--text); color: white;
+  padding: 10px 16px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(8px); opacity: 0;
+  transition: all 0.2s; pointer-events: none; z-index: 999;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+  aside { display: none; }
+  .grid2 { grid-template-columns: 1fr; }
+  main { padding: 14px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  </div>
+  <span class="logo-text">도시계획 검토서</span>
+  <span class="logo-sub">작성 도구</span>
+  <div class="header-spacer"></div>
+  <div class="powered">Powered by <span>Claude AI</span></div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="side-label">문서 유형</div>
+    <button class="doc-btn active" onclick="setType(this,'검토서')">
+      <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12V7a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h7"/><circle cx="18" cy="18" r="3"/></svg>검토서
+    </button>
+    <button class="doc-btn" onclick="setType(this,'용역 보고서')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>용역 보고서
+    </button>
+    <button class="doc-btn" onclick="setType(this,'의견서')">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>의견서
+    </button>
+    <button class="doc-btn" onclick="setType(this,'분석 보고서')">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>분석 보고서
+    </button>
+    <button class="doc-btn" onclick="setType(this,'계획 검토서')">
+      <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>계획 검토서
+    </button>
+  </aside>
+
+  <main>
+    <div>
+      <div class="page-title" id="pageTitle">검토서 작성</div>
+      <div class="page-sub">아래 정보를 입력하고 AI 초안 생성을 누르세요. API 키가 없어도 바로 사용 가능합니다.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>기본 정보
+      </div>
+      <div class="grid2">
+        <div class="field full">
+          <label>문서 제목</label>
+          <input type="text" id="docTitle" placeholder="예) 「고양 GB해제취락 지구단위계획 재정비」허용용도 검토서" />
+        </div>
+        <div class="field">
+          <label>발주처 (공공기관)</label>
+          <input type="text" id="client" placeholder="예) 고양시청 도시계획과" />
+        </div>
+        <div class="field">
+          <label>수행 기관</label>
+          <input type="text" id="agency" placeholder="예) 선진엔지니어링" />
+        </div>
+        <div class="field">
+          <label>작성일</label>
+          <input type="date" id="docDate" />
+        </div>
+        <div class="field">
+          <label>담당자 / 직책</label>
+          <input type="text" id="author" placeholder="예) 홍길동 / 도시계획팀장" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>대상지 정보
+      </div>
+      <div class="grid2">
+        <div class="field full">
+          <label>위치 / 지번</label>
+          <input type="text" id="location" placeholder="예) 고양시 개발제한구역 해제취락 일원" />
+        </div>
+        <div class="field">
+          <label>용도지역</label>
+          <select id="zoning">
+            <option value="">선택</option>
+            <optgroup label="주거지역">
+              <option>제1종전용주거지역</option><option>제2종전용주거지역</option>
+              <option>제1종일반주거지역</option><option>제2종일반주거지역</option>
+              <option>제3종일반주거지역</option><option>준주거지역</option>
+            </optgroup>
+            <optgroup label="상업지역">
+              <option>중심상업지역</option><option>일반상업지역</option>
+              <option>근린상업지역</option><option>유통상업지역</option>
+            </optgroup>
+            <optgroup label="공업지역">
+              <option>전용공업지역</option><option>일반공업지역</option><option>준공업지역</option>
+            </optgroup>
+            <optgroup label="녹지지역">
+              <option>보전녹지지역</option><option>생산녹지지역</option><option>자연녹지지역</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field">
+          <label>대지면적</label>
+          <input type="text" id="area" placeholder="예) 1,200㎡" />
+        </div>
+        <div class="field full">
+          <label>관련 법령 / 계획</label>
+          <input type="text" id="law" placeholder="예) 국토계획법, 건축법, 고양시 도시계획 조례" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>검토 배경 및 목적
+      </div>
+      <div class="field">
+        <textarea id="background" rows="4" placeholder="검토가 필요한 배경, 현황 문제, 용역 목적 등을 입력하세요..."></textarea>
+      </div>
+      <div class="tag-row">
+        <span class="tag" onclick="ins('background','도시관리계획 변경 필요성에 따라 검토를 실시함')">도시관리계획 변경</span>
+        <span class="tag" onclick="ins('background','노후 시설 정비 및 환경 개선을 위한 계획 수립이 필요함')">노후 시설 정비</span>
+        <span class="tag" onclick="ins('background','인구 변화 및 도시 성장에 대응한 용도지역 조정이 요구됨')">용도지역 조정</span>
+        <span class="tag" onclick="ins('background','개발제한구역 해제취락에 대한 지구단위계획 허용용도 적정성 검토가 필요함')">GB해제취락 검토</span>
+        <span class="tag" onclick="ins('background','지역 주민의 생활환경 향상을 위한 기반시설 계획 검토가 필요함')">기반시설 계획</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>현황 및 분석 사항
+      </div>
+      <div class="field">
+        <textarea id="current" rows="4" placeholder="현황 조사 결과, 분석 내용, 관련 법령 검토 결과 등을 입력하세요..."></textarea>
+      </div>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-header">
+        <div class="ai-header-title">AI 초안 생성</div>
+        <div class="ai-badge">Claude AI</div>
+        <div style="flex:1"></div>
+        <button class="small-btn" onclick="clearAll()">
+          <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>초기화
+        </button>
+      </div>
+      <div class="ai-body">
+        <div class="extra-row">
+          <div class="field" style="flex:1;gap:4px">
+            <label>추가 지시사항 (선택)</label>
+            <textarea id="aiPrompt" rows="2" placeholder="예) 교통영향 분석 포함, 상위 계획 부합성 검토, 허용용도 표 정리..."></textarea>
+          </div>
+          <button class="gen-btn" id="genBtn" onclick="generate()">
+            <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>초안 생성
+          </button>
+        </div>
+        <div class="tag-row">
+          <span class="tag" onclick="sp('검토 의견 및 결론을 공공기관 담당자가 납득할 수 있도록 논리적·체계적으로 작성')">검토 의견·결론</span>
+          <span class="tag" onclick="sp('관련 법령 근거를 포함하여 타당성 검토 내용 작성')">법령 근거 포함</span>
+          <span class="tag" onclick="sp('허용 용도 가능 여부를 표로 정리하고 조건부 허용 기준도 명시')">허용용도 표 정리</span>
+          <span class="tag" onclick="sp('상위 계획(도시기본계획, 광역도시계획)과의 부합성 검토 내용 작성')">상위 계획 부합성</span>
+          <span class="tag" onclick="sp('기반시설 용량 분석과 적정성 검토 내용 포함')">기반시설 검토</span>
+          <span class="tag" onclick="sp('주민 의견 수렴 절차와 결과를 포함한 내용 추가')">주민 의견 수렴</span>
+        </div>
+
+        <div class="output-wrap" id="outputWrap">
+          <div class="output-toolbar">
+            <div class="output-label">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              생성된 검토서 초안
+            </div>
+            <button class="small-btn" onclick="copyOutput()">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>복사
+            </button>
+            <button class="small-btn" onclick="dlOutput()">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>다운로드
+            </button>
+          </div>
+          <div class="progress-bar" id="progBar"><div class="progress-fill"></div></div>
+          <div class="output-body" id="outputBody"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentType = '검토서';
+let busy = false;
+
+function setType(el, type) {
+  document.querySelectorAll('.doc-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  currentType = type;
+  document.getElementById('pageTitle').textContent = type + ' 작성';
+}
+
+function ins(id, text) {
+  const el = document.getElementById(id);
+  el.value = el.value ? el.value + '\n' + text : text;
+  el.focus();
+}
+
+function sp(text) { document.getElementById('aiPrompt').value = text; }
+
+function clearAll() {
+  ['docTitle','client','agency','docDate','author','location','area','law','background','current','aiPrompt']
+    .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+  document.getElementById('zoning').value = '';
+  document.getElementById('outputWrap').style.display = 'none';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function copyOutput() {
+  const text = document.getElementById('outputBody').textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => showToast('✓ 클립보드에 복사됨'));
+}
+
+function dlOutput() {
+  const text = document.getElementById('outputBody').textContent;
+  if (!text) return;
+  const title = document.getElementById('docTitle').value || '도시계획검토서';
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = title.replace(/[\\/:*?"<>|「」]/g, '') + '.txt';
+  a.click();
+  showToast('✓ 파일 다운로드 시작');
+}
+
+async function generate() {
+  if (busy) return;
+  busy = true;
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:white;fill:none;stroke-width:2"><circle cx="12" cy="12" r="10"/></svg>생성 중...';
+
+  const g = id => document.getElementById(id).value.trim();
+  const payload = {
+    docType: currentType,
+    docTitle: g('docTitle'), client: g('client'), agency: g('agency'),
+    docDate: g('docDate'), author: g('author'), location: g('location'),
+    zoning: g('zoning'), area: g('area'), law: g('law'),
+    background: g('background'), current: g('current'), extra: g('aiPrompt')
+  };
+
+  const wrap = document.getElementById('outputWrap');
+  const body = document.getElementById('outputBody');
+  const prog = document.getElementById('progBar');
+
+  wrap.style.display = 'block';
+  body.className = 'output-body';
+  body.textContent = '';
+  prog.style.display = 'block';
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `서버 오류 (${res.status})`);
+    }
+
+    prog.style.display = 'none';
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    body.appendChild(cursor);
+
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (!raw || raw === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(raw);
+          // Gemini SSE 포맷: candidates[0].content.parts[0].text
+          const txt = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (txt) {
+            body.insertBefore(document.createTextNode(txt), cursor);
+            body.scrollTop = body.scrollHeight;
+          }
+        } catch (_) {}
+      }
+    }
+    cursor.remove();
+    showToast('✓ 검토서 초안 생성 완료');
+
+  } catch (e) {
+    prog.style.display = 'none';
+    body.className = 'output-body error';
+    body.textContent = '오류: ' + e.message;
+  } finally {
+    busy = false;
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:white;fill:none;stroke-width:2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>초안 생성';
+  }
+}
+
+document.getElementById('docDate').value = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
