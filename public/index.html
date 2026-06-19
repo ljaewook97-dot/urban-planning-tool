@@ -6,295 +6,137 @@
 <title>도시계획 검토서 작성 도구</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #f7f6f3;
-  --surface: #ffffff;
-  --surface2: #f2f1ee;
-  --border: #e2e0db;
-  --border2: #cccac4;
-  --text: #1a1917;
-  --text2: #6b6860;
-  --text3: #9e9c97;
-  --blue: #1a56a0;
-  --blue-light: #e8f0fb;
-  --blue-mid: #3b74c4;
-  --green: #1a7a4a;
-  --green-light: #e6f4ed;
-  --red: #b91c1c;
-  --red-light: #fef2f2;
-  --radius: 8px;
-  --radius-lg: 12px;
+  --bg: #f7f6f3; --surface: #fff; --surface2: #f2f1ee;
+  --border: #e2e0db; --border2: #cccac4;
+  --text: #1a1917; --text2: #6b6860; --text3: #9e9c97;
+  --blue: #1a56a0; --blue-light: #e8f0fb; --blue-mid: #3b74c4;
+  --green: #1a7a4a; --green-light: #e6f4ed;
+  --amber: #92600a; --amber-light: #fef3e2;
+  --red: #b91c1c; --red-light: #fef2f2;
+  --radius: 8px; --radius-lg: 12px;
   --shadow: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-lg: 0 4px 16px rgba(0,0,0,0.10);
 }
+body { font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.6; min-height:100vh; }
 
-body {
-  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  font-size: 14px;
-  line-height: 1.6;
-}
+/* Header */
+header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 24px; display:flex; align-items:center; gap:14px; height:56px; position:sticky; top:0; z-index:100; }
+.logo { width:32px; height:32px; background:var(--blue); border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.logo svg { width:17px; height:17px; fill:white; }
+.logo-text { font-size:15px; font-weight:700; letter-spacing:-0.3px; }
+.logo-sub { font-size:12px; color:var(--text3); margin-left:2px; }
+.header-space { flex:1; }
+.powered { font-size:11px; color:var(--text3); }
+.powered b { color:var(--blue); }
 
-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  height: 56px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 1px 0 var(--border);
-}
-.logo-mark {
-  width: 32px; height: 32px;
-  background: var(--blue);
-  border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.logo-mark svg { width: 17px; height: 17px; fill: white; }
-.logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
-.logo-sub { font-size: 12px; color: var(--text3); margin-left: 2px; }
-.header-spacer { flex: 1; }
-.powered { font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
-.powered span { color: var(--blue); font-weight: 600; }
+/* Layout */
+.layout { display:grid; grid-template-columns:200px 1fr; min-height:calc(100vh - 56px); }
 
-.layout { display: grid; grid-template-columns: 210px 1fr; min-height: calc(100vh - 56px); }
+/* Sidebar */
+aside { background:var(--surface); border-right:1px solid var(--border); padding:16px 10px; display:flex; flex-direction:column; gap:4px; }
+.side-label { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); padding:0 8px; margin:10px 0 4px; }
+.doc-btn { display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:var(--radius); border:none; background:none; font-size:13px; color:var(--text2); cursor:pointer; width:100%; text-align:left; transition:background .12s,color .12s; }
+.doc-btn:hover { background:var(--bg); color:var(--text); }
+.doc-btn.active { background:var(--blue-light); color:var(--blue); font-weight:600; }
+.doc-btn svg { width:15px; height:15px; flex-shrink:0; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 
-aside {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 18px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.side-label {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--text3);
-  padding: 0 8px; margin: 10px 0 4px;
-}
-.side-label:first-child { margin-top: 0; }
-.doc-btn {
-  display: flex; align-items: center; gap: 9px;
-  padding: 9px 10px;
-  border-radius: var(--radius);
-  border: none; background: none;
-  font-size: 13px; color: var(--text2);
-  cursor: pointer; width: 100%; text-align: left;
-  transition: background 0.12s, color 0.12s;
-}
-.doc-btn:hover { background: var(--bg); color: var(--text); }
-.doc-btn.active { background: var(--blue-light); color: var(--blue); font-weight: 600; }
-.doc-btn svg { width: 15px; height: 15px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* Main */
+main { padding:24px; display:flex; flex-direction:column; gap:14px; max-width:900px; }
+.page-title { font-size:20px; font-weight:700; letter-spacing:-.4px; }
+.page-sub { font-size:13px; color:var(--text2); margin-top:3px; }
 
-main {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  max-width: 860px;
-}
+/* Cards */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 20px; box-shadow:var(--shadow); }
+.card-title { font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--text3); margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+.card-title svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+.full { grid-column:1/-1; }
+.field { display:flex; flex-direction:column; gap:4px; }
+.field label { font-size:12px; color:var(--text2); font-weight:500; }
+.field input,.field select,.field textarea { padding:8px 10px; border:1px solid var(--border2); border-radius:var(--radius); background:var(--surface2); font-size:13px; font-family:inherit; color:var(--text); outline:none; transition:border-color .15s,box-shadow .15s,background .15s; }
+.field input:focus,.field select:focus,.field textarea:focus { border-color:var(--blue-mid); background:var(--surface); box-shadow:0 0 0 3px rgba(59,116,196,.10); }
+.field textarea { resize:vertical; line-height:1.6; }
+.field select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239e9c97' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:28px; }
+.tag-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.tag { font-size:11px; padding:3px 10px; border-radius:20px; background:var(--surface2); border:1px solid var(--border); color:var(--text2); cursor:pointer; transition:all .12s; }
+.tag:hover { border-color:var(--blue-mid); color:var(--blue); background:var(--blue-light); }
 
-.page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
-.page-sub { font-size: 13px; color: var(--text2); margin-top: 3px; }
+/* AI Card */
+.ai-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow); }
+.ai-header { display:flex; align-items:center; gap:10px; padding:14px 20px; border-bottom:1px solid var(--border); background:var(--surface2); }
+.ai-header-title { font-size:14px; font-weight:700; }
+.ai-badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; background:var(--blue); color:white; }
+.ai-body { padding:16px 20px; }
+.extra-row { display:flex; gap:8px; align-items:flex-end; margin-bottom:10px; }
+.extra-row textarea { flex:1; min-height:52px; }
+.gen-btn { padding:0 22px; height:52px; background:var(--blue); color:white; border:none; border-radius:var(--radius); font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:7px; white-space:nowrap; flex-shrink:0; transition:background .15s,transform .1s; }
+.gen-btn:hover { background:#1044a0; }
+.gen-btn:active { transform:scale(.98); }
+.gen-btn:disabled { background:var(--border2); cursor:not-allowed; transform:none; }
+.gen-btn svg { width:15px; height:15px; stroke:white; fill:none; stroke-width:2.2; }
+.small-btn { padding:5px 10px; border-radius:6px; border:1px solid var(--border2); background:var(--surface); color:var(--text2); font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:background .12s; }
+.small-btn:hover { background:var(--bg); color:var(--text); }
+.small-btn svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:2; }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
-  box-shadow: var(--shadow);
-}
-.card-title {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
-  text-transform: uppercase; color: var(--text3);
-  margin-bottom: 14px;
-  display: flex; align-items: center; gap: 6px;
-}
-.card-title svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
-
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
-.full { grid-column: 1 / -1; }
-
-.field { display: flex; flex-direction: column; gap: 4px; }
-.field label { font-size: 12px; color: var(--text2); font-weight: 500; }
-.field input, .field select, .field textarea {
-  padding: 8px 10px;
-  border: 1px solid var(--border2);
-  border-radius: var(--radius);
-  background: var(--surface2);
-  font-size: 13px; font-family: inherit;
-  color: var(--text); outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-}
-.field input:focus, .field select:focus, .field textarea:focus {
-  border-color: var(--blue-mid);
-  background: var(--surface);
-  box-shadow: 0 0 0 3px rgba(59,116,196,0.10);
-}
-.field textarea { resize: vertical; line-height: 1.6; }
-.field select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239e9c97' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
-}
-
-.tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-.tag {
-  font-size: 11px; padding: 3px 10px; border-radius: 20px;
-  background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text2); cursor: pointer; transition: all 0.12s;
-}
-.tag:hover { border-color: var(--blue-mid); color: var(--blue); background: var(--blue-light); }
-
-.ai-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-.ai-header {
-  display: flex; align-items: center; gap: 10px;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface2);
-}
-.ai-header-title { font-size: 14px; font-weight: 700; }
-.ai-badge {
-  font-size: 10px; font-weight: 700; padding: 3px 8px;
-  border-radius: 20px; background: var(--blue); color: white;
-}
-.ai-body { padding: 16px 20px; }
-.extra-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px; }
-.extra-row textarea { flex: 1; min-height: 52px; }
-
-.gen-btn {
-  padding: 0 22px; height: 52px;
-  background: var(--blue); color: white;
-  border: none; border-radius: var(--radius);
-  font-size: 14px; font-weight: 700;
-  cursor: pointer;
-  display: flex; align-items: center; gap: 7px;
-  white-space: nowrap; flex-shrink: 0;
-  transition: background 0.15s, transform 0.1s;
-}
-.gen-btn:hover { background: #1044a0; }
-.gen-btn:active { transform: scale(0.98); }
-.gen-btn:disabled { background: var(--border2); cursor: not-allowed; transform: none; }
-.gen-btn svg { width: 15px; height: 15px; stroke: white; fill: none; stroke-width: 2.2; }
-
-.small-btn {
-  padding: 5px 10px; border-radius: 6px;
-  border: 1px solid var(--border2);
-  background: var(--surface); color: var(--text2);
-  font-size: 12px; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 5px;
-  transition: background 0.12s;
-}
-.small-btn:hover { background: var(--bg); color: var(--text); }
-.small-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
-
-.output-wrap {
-  margin-top: 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  display: none;
-}
-.output-toolbar {
-  display: flex; align-items: center; gap: 8px;
-  padding: 9px 14px;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-}
-.output-label { font-size: 12px; font-weight: 600; color: var(--text2); flex: 1; display: flex; align-items: center; gap: 5px; }
-.output-label svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
-.progress-bar { height: 3px; background: var(--blue-light); display: none; }
-.progress-fill { height: 100%; background: var(--blue); animation: prog 2.5s ease-in-out infinite; }
+/* Output */
+.output-wrap { margin-top:14px; border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; display:none; }
+.output-toolbar { display:flex; align-items:center; gap:8px; padding:9px 14px; background:var(--surface2); border-bottom:1px solid var(--border); }
+.output-label { font-size:12px; font-weight:600; color:var(--text2); flex:1; display:flex; align-items:center; gap:5px; }
+.output-label svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; }
+.progress-bar { height:3px; background:var(--blue-light); display:none; }
+.progress-fill { height:100%; background:var(--blue); animation:prog 2.5s ease-in-out infinite; }
 @keyframes prog { 0%{width:0%} 70%{width:85%} 100%{width:95%} }
-.output-body {
-  padding: 24px 28px;
-  font-size: 14px; line-height: 2.0;
-  color: var(--text);
-  min-height: 100px; max-height: 900px;
-  overflow-y: auto; background: var(--surface);
-  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  word-break: keep-all;
-  letter-spacing: 0.01em;
-  white-space: pre-wrap;
-}
-.output-body.error { color: var(--red); background: var(--red-light); white-space: pre-wrap; }
-.doc-section { margin-bottom: 28px; }
-.doc-section-title {
-  font-size: 15px; font-weight: 700;
-  color: var(--blue); border-bottom: 2px solid var(--blue-light);
-  padding-bottom: 6px; margin-bottom: 14px;
-  letter-spacing: -0.2px;
-}
-.doc-para { margin-bottom: 12px; line-height: 2.0; white-space: pre-wrap; }
-.result-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
-.result-table th {
-  background: var(--surface2); padding: 10px 14px;
-  border: 1px solid var(--border); font-weight: 600;
-  text-align: left; color: var(--text2); font-size: 12px;
-}
-.result-table td { padding: 10px 14px; border: 1px solid var(--border); vertical-align: middle; line-height: 1.6; }
-.result-table tr:hover td { background: var(--surface2); }
-.badge-ok   { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:#e6f4ed;color:#1a7a4a;font-size:12px;font-weight:700; }
-.badge-cond { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:#fef3e2;color:#92600a;font-size:12px;font-weight:700; }
-.badge-no   { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:#fef2f2;color:#b91c1c;font-size:12px;font-weight:700; }
-.final-opinion {
-  background: var(--blue-light); border-left: 4px solid var(--blue);
-  border-radius: 0 var(--radius) var(--radius) 0;
-  padding: 14px 18px; margin-top: 16px;
-  font-size: 13px; line-height: 1.85; white-space: pre-wrap;
-}
-.final-opinion-title { font-weight: 700; color: var(--blue); margin-bottom: 6px; font-size: 13px; }
-.output-body.error { color: var(--red); background: var(--red-light); }
-.cursor {
-  display: inline-block; width: 2px; height: 14px;
-  background: var(--blue); margin-left: 2px; vertical-align: middle;
-  animation: blink 0.8s step-end infinite;
-}
+
+/* 스트리밍 중 raw 텍스트 영역 */
+.output-raw { padding:24px 28px; font-size:14px; line-height:2.0; white-space:pre-wrap; color:var(--text); background:var(--surface); font-family:inherit; word-break:keep-all; display:none; }
+.output-raw.visible { display:block; }
+
+/* 렌더링된 결과 영역 */
+.output-rendered { padding:24px 28px; background:var(--surface); display:none; max-height:900px; overflow-y:auto; }
+.output-rendered.visible { display:block; }
+
+/* 렌더링 스타일 */
+.doc-section { margin-bottom:28px; }
+.doc-section-title { font-size:15px; font-weight:700; color:var(--blue); border-bottom:2px solid var(--blue-light); padding-bottom:7px; margin-bottom:14px; letter-spacing:-.2px; }
+.doc-sub-title { font-size:14px; font-weight:700; color:var(--text); margin:16px 0 8px; }
+.doc-para { font-size:14px; line-height:2.0; color:var(--text); margin-bottom:10px; white-space:pre-wrap; word-break:keep-all; }
+
+/* 종합결론 표 */
+.result-section { margin-bottom:28px; }
+.result-table-wrap { overflow-x:auto; margin-top:12px; }
+.result-table { width:100%; border-collapse:collapse; font-size:13px; }
+.result-table th { background:var(--surface2); padding:10px 14px; border:1px solid var(--border); font-weight:600; text-align:left; color:var(--text2); font-size:12px; white-space:nowrap; }
+.result-table td { padding:11px 14px; border:1px solid var(--border); vertical-align:middle; line-height:1.6; }
+.result-table tr:nth-child(even) td { background:#fafaf9; }
+.badge { display:inline-flex; align-items:center; gap:4px; padding:4px 11px; border-radius:20px; font-size:12px; font-weight:700; white-space:nowrap; }
+.badge-ok   { background:var(--green-light); color:var(--green); }
+.badge-cond { background:var(--amber-light); color:var(--amber); }
+.badge-no   { background:var(--red-light); color:var(--red); }
+
+/* 최종의견 박스 */
+.final-box { background:var(--blue-light); border-left:4px solid var(--blue); border-radius:0 var(--radius) var(--radius) 0; padding:16px 20px; margin-top:8px; }
+.final-box-title { font-size:13px; font-weight:700; color:var(--blue); margin-bottom:8px; }
+.final-box-body { font-size:13px; line-height:1.9; color:var(--text); white-space:pre-wrap; }
+
+/* cursor */
+.cursor { display:inline-block; width:2px; height:14px; background:var(--blue); margin-left:2px; vertical-align:middle; animation:blink .8s step-end infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
-.toast {
-  position: fixed; bottom: 24px; right: 24px;
-  background: var(--text); color: white;
-  padding: 10px 16px; border-radius: var(--radius);
-  font-size: 13px; font-weight: 500;
-  box-shadow: var(--shadow-lg);
-  transform: translateY(8px); opacity: 0;
-  transition: all 0.2s; pointer-events: none; z-index: 999;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
+/* Toast */
+.toast { position:fixed; bottom:24px; right:24px; background:var(--text); color:white; padding:10px 16px; border-radius:var(--radius); font-size:13px; font-weight:500; box-shadow:0 4px 16px rgba(0,0,0,.12); transform:translateY(8px); opacity:0; transition:all .2s; pointer-events:none; z-index:999; }
+.toast.show { transform:translateY(0); opacity:1; }
 
-@media (max-width: 720px) {
-  .layout { grid-template-columns: 1fr; }
-  aside { display: none; }
-  .grid2 { grid-template-columns: 1fr; }
-  main { padding: 14px; }
-}
+@media(max-width:720px){ .layout{grid-template-columns:1fr} aside{display:none} .grid2{grid-template-columns:1fr} main{padding:14px} }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo-mark">
-    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-  </div>
+  <div class="logo"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
   <span class="logo-text">도시계획 검토서</span>
   <span class="logo-sub">작성 도구</span>
-  <div class="header-spacer"></div>
-  <div class="powered">Powered by <span>Groq AI</span></div>
+  <div class="header-space"></div>
+  <div class="powered">Powered by <b>Groq AI</b></div>
 </header>
 
 <div class="layout">
@@ -320,46 +162,26 @@ main {
   <main>
     <div>
       <div class="page-title" id="pageTitle">검토서 작성</div>
-      <div class="page-sub">아래 정보를 입력하고 AI 초안 생성을 누르세요. API 키가 없어도 바로 사용 가능합니다.</div>
+      <div class="page-sub">아래 정보를 입력하고 AI 초안 생성을 누르세요.</div>
     </div>
 
+    <!-- 기본정보 -->
     <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>기본 정보
-      </div>
+      <div class="card-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>기본 정보</div>
       <div class="grid2">
-        <div class="field full">
-          <label>문서 제목</label>
-          <input type="text" id="docTitle" placeholder="예) 「고양 GB해제취락 지구단위계획 재정비」허용용도 검토서" />
-        </div>
-        <div class="field">
-          <label>발주처 (공공기관)</label>
-          <input type="text" id="client" placeholder="예) 고양시청 도시계획과" />
-        </div>
-        <div class="field">
-          <label>수행 기관</label>
-          <input type="text" id="agency" placeholder="예) 선진엔지니어링" />
-        </div>
-        <div class="field">
-          <label>작성일</label>
-          <input type="date" id="docDate" />
-        </div>
-        <div class="field">
-          <label>담당자 / 직책</label>
-          <input type="text" id="author" placeholder="예) 홍길동 / 도시계획팀장" />
-        </div>
+        <div class="field full"><label>문서 제목</label><input type="text" id="docTitle" placeholder="예) 「고양 GB해제취락 지구단위계획 재정비」허용용도 검토서"/></div>
+        <div class="field"><label>발주처</label><input type="text" id="client" placeholder="예) 고양시청 도시계획과"/></div>
+        <div class="field"><label>수행 기관</label><input type="text" id="agency" placeholder="예) 선진엔지니어링"/></div>
+        <div class="field"><label>작성일</label><input type="date" id="docDate"/></div>
+        <div class="field"><label>담당자 / 직책</label><input type="text" id="author" placeholder="예) 홍길동 / 도시계획팀장"/></div>
       </div>
     </div>
 
+    <!-- 대상지 정보 -->
     <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>대상지 정보
-      </div>
+      <div class="card-title"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>대상지 정보</div>
       <div class="grid2">
-        <div class="field full">
-          <label>위치 / 지번</label>
-          <input type="text" id="location" placeholder="예) 고양시 개발제한구역 해제취락 일원" />
-        </div>
+        <div class="field full"><label>위치 / 지번</label><input type="text" id="location" placeholder="예) 고양시 덕양구 ○○동 123번지 일원"/></div>
         <div class="field">
           <label>용도지역</label>
           <select id="zoning">
@@ -381,42 +203,33 @@ main {
             </optgroup>
           </select>
         </div>
-        <div class="field">
-          <label>대지면적</label>
-          <input type="text" id="area" placeholder="예) 1,200㎡" />
-        </div>
-        <div class="field full">
-          <label>관련 법령 / 계획</label>
-          <input type="text" id="law" placeholder="예) 국토계획법, 건축법, 고양시 도시계획 조례" />
-        </div>
+        <div class="field"><label>용도지구 · 용도구역</label><input type="text" id="zoneDistrict" placeholder="예) 지구단위계획구역, 개발제한구역 해제구역"/></div>
+        <div class="field"><label>인접 용도지역</label><input type="text" id="nearbyZoning" placeholder="예) 북측 자연녹지, 남측 제2종일반주거, 동측 준공업"/></div>
+        <div class="field"><label>주변 토지이용 현황</label><input type="text" id="nearbyLanduse" placeholder="예) 북측 산림, 남측 단독주택, 동측 근린상가"/></div>
+        <div class="field"><label>대지면적</label><input type="text" id="area" placeholder="예) 1,200㎡"/></div>
+        <div class="field full"><label>관련 법령 / 계획</label><input type="text" id="law" placeholder="예) 국토계획법, 건축법, 고양시 도시계획 조례, 개특법"/></div>
       </div>
     </div>
 
+    <!-- 검토 배경 -->
     <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>검토 배경 및 목적
-      </div>
-      <div class="field">
-        <textarea id="background" rows="4" placeholder="검토가 필요한 배경, 현황 문제, 용역 목적 등을 입력하세요..."></textarea>
-      </div>
+      <div class="card-title"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>검토 배경 및 목적</div>
+      <div class="field"><textarea id="background" rows="4" placeholder="검토 배경, 현황 문제, 용역 목적 등을 입력하세요..."></textarea></div>
       <div class="tag-row">
+        <span class="tag" onclick="ins('background','개발제한구역 해제취락에 대한 지구단위계획 허용용도 적정성 검토가 필요함')">GB해제취락 허용용도 검토</span>
         <span class="tag" onclick="ins('background','도시관리계획 변경 필요성에 따라 검토를 실시함')">도시관리계획 변경</span>
         <span class="tag" onclick="ins('background','노후 시설 정비 및 환경 개선을 위한 계획 수립이 필요함')">노후 시설 정비</span>
-        <span class="tag" onclick="ins('background','인구 변화 및 도시 성장에 대응한 용도지역 조정이 요구됨')">용도지역 조정</span>
-        <span class="tag" onclick="ins('background','개발제한구역 해제취락에 대한 지구단위계획 허용용도 적정성 검토가 필요함')">GB해제취락 검토</span>
-        <span class="tag" onclick="ins('background','지역 주민의 생활환경 향상을 위한 기반시설 계획 검토가 필요함')">기반시설 계획</span>
+        <span class="tag" onclick="ins('background','용도지역 변경에 따른 허용용도 및 건축기준 적정성 검토가 필요함')">용도지역 변경 검토</span>
       </div>
     </div>
 
+    <!-- 현황 분석 -->
     <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>현황 및 분석 사항
-      </div>
-      <div class="field">
-        <textarea id="current" rows="4" placeholder="현황 조사 결과, 분석 내용, 관련 법령 검토 결과 등을 입력하세요..."></textarea>
-      </div>
+      <div class="card-title"><svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>현황 및 분석 사항</div>
+      <div class="field"><textarea id="current" rows="4" placeholder="현황 조사 결과, 기존 지구단위계획 내용, 민원·협의 내용 등을 입력하세요..."></textarea></div>
     </div>
 
+    <!-- AI 생성 -->
     <div class="ai-card">
       <div class="ai-header">
         <div class="ai-header-title">AI 초안 생성</div>
@@ -430,19 +243,18 @@ main {
         <div class="extra-row">
           <div class="field" style="flex:1;gap:4px">
             <label>추가 지시사항 (선택)</label>
-            <textarea id="aiPrompt" rows="2" placeholder="예) 교통영향 분석 포함, 상위 계획 부합성 검토, 허용용도 표 정리..."></textarea>
+            <textarea id="aiPrompt" rows="2" placeholder="예) 자동차 전시장·제조업·업무시설 허용 여부 검토, 상위 계획 부합성 포함..."></textarea>
           </div>
           <button class="gen-btn" id="genBtn" onclick="generate()">
             <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>초안 생성
           </button>
         </div>
         <div class="tag-row">
-          <span class="tag" onclick="sp('검토 의견 및 결론을 공공기관 담당자가 납득할 수 있도록 논리적·체계적으로 작성')">검토 의견·결론</span>
-          <span class="tag" onclick="sp('관련 법령 근거를 포함하여 타당성 검토 내용 작성')">법령 근거 포함</span>
-          <span class="tag" onclick="sp('허용 용도 가능 여부를 표로 정리하고 조건부 허용 기준도 명시')">허용용도 표 정리</span>
-          <span class="tag" onclick="sp('상위 계획(도시기본계획, 광역도시계획)과의 부합성 검토 내용 작성')">상위 계획 부합성</span>
-          <span class="tag" onclick="sp('기반시설 용량 분석과 적정성 검토 내용 포함')">기반시설 검토</span>
-          <span class="tag" onclick="sp('주민 의견 수렴 절차와 결과를 포함한 내용 추가')">주민 의견 수렴</span>
+          <span class="tag" onclick="sp('제조업·자동차 전시장·업무시설 허용 여부를 법령 및 주변현황과 연계하여 검토')">허용용도 3종 검토</span>
+          <span class="tag" onclick="sp('상위 계획(도시기본계획, 광역도시계획)과의 부합성 검토 포함')">상위 계획 부합성</span>
+          <span class="tag" onclick="sp('기반시설(도로·주차·상하수도) 용량 분석과 적정성 검토 포함')">기반시설 검토</span>
+          <span class="tag" onclick="sp('주민 의견 수렴 결과 및 관련 민원 내용을 반영하여 검토')">주민 의견 반영</span>
+          <span class="tag" onclick="sp('조건부 허용 기준을 구체적 면적·업종·이격거리 조건으로 명시')">조건부 기준 구체화</span>
         </div>
 
         <div class="output-wrap" id="outputWrap">
@@ -459,7 +271,10 @@ main {
             </button>
           </div>
           <div class="progress-bar" id="progBar"><div class="progress-fill"></div></div>
-          <div class="output-body" id="outputBody"></div>
+          <!-- 스트리밍 중 raw 텍스트 -->
+          <div class="output-raw" id="outputRaw"></div>
+          <!-- 완료 후 렌더링 결과 -->
+          <div class="output-rendered" id="outputRendered"></div>
         </div>
       </div>
     </div>
@@ -471,6 +286,7 @@ main {
 <script>
 let currentType = '검토서';
 let busy = false;
+let fullText = '';
 
 function setType(el, type) {
   document.querySelectorAll('.doc-btn').forEach(b => b.classList.remove('active'));
@@ -488,10 +304,13 @@ function ins(id, text) {
 function sp(text) { document.getElementById('aiPrompt').value = text; }
 
 function clearAll() {
-  ['docTitle','client','agency','docDate','author','location','area','law','background','current','aiPrompt']
+  ['docTitle','client','agency','docDate','author','location','zoneDistrict','nearbyZoning','nearbyLanduse','area','law','background','current','aiPrompt']
     .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
   document.getElementById('zoning').value = '';
   document.getElementById('outputWrap').style.display = 'none';
+  document.getElementById('outputRaw').className = 'output-raw';
+  document.getElementById('outputRendered').className = 'output-rendered';
+  fullText = '';
 }
 
 function showToast(msg) {
@@ -501,14 +320,18 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
+function getRawText() {
+  return fullText || document.getElementById('outputRaw').textContent;
+}
+
 function copyOutput() {
-  const text = document.getElementById('outputBody').textContent;
+  const text = getRawText();
   if (!text) return;
   navigator.clipboard.writeText(text).then(() => showToast('✓ 클립보드에 복사됨'));
 }
 
 function dlOutput() {
-  const text = document.getElementById('outputBody').textContent;
+  const text = getRawText();
   if (!text) return;
   const title = document.getElementById('docTitle').value || '도시계획검토서';
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -519,114 +342,167 @@ function dlOutput() {
   showToast('✓ 파일 다운로드 시작');
 }
 
-function renderOutput(container) {
-  const raw = container.textContent;
-  container.textContent = '';
-  container.style.whiteSpace = 'normal';
+/* ── 렌더링 엔진 ── */
+function renderDoc(raw) {
+  const rendered = document.getElementById('outputRendered');
+  rendered.innerHTML = '';
 
-  // 종합결론 블록 분리
-  const summaryMarker = '=== 종합 검토 결론 ===';
-  const finalMarker = '◆ 최종 의견';
-  let mainText = raw;
-  let summaryText = '';
-  let finalText = '';
+  // RESULT_TABLE 분리
+  const tblStart = 'RESULT_TABLE_START';
+  const tblEnd = 'RESULT_TABLE_END';
+  const siStart = raw.indexOf(tblStart);
+  const siEnd   = raw.indexOf(tblEnd);
 
-  const sumIdx = raw.indexOf(summaryMarker);
-  if (sumIdx !== -1) {
-    mainText = raw.slice(0, sumIdx).trimEnd();
-    const afterSum = raw.slice(sumIdx + summaryMarker.length);
-    const finalIdx = afterSum.indexOf(finalMarker);
-    if (finalIdx !== -1) {
-      summaryText = afterSum.slice(0, finalIdx).trim();
-      finalText = afterSum.slice(finalIdx + finalMarker.length).trim();
-    } else {
-      summaryText = afterSum.trim();
+  let beforeTable = raw;
+  let tableRows   = [];
+  let afterTable  = '';
+
+  if (siStart !== -1 && siEnd !== -1) {
+    beforeTable = raw.slice(0, siStart);
+    const tableRaw = raw.slice(siStart + tblStart.length, siEnd).trim();
+    afterTable  = raw.slice(siEnd + tblEnd.length);
+    tableRows = tableRaw.split('\n').map(l => l.trim()).filter(Boolean);
+  }
+
+  // ##SECTION## 기준으로 섹션 분리
+  const sectionRegex = /##SECTION:([^#]+)##/g;
+  const parts = beforeTable.split(sectionRegex);
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i].trim();
+    if (!part) continue;
+
+    // 홀수 인덱스 = 섹션 제목, 짝수 = 내용
+    if (i % 2 === 1) {
+      // 섹션 제목
+      const secDiv = document.createElement('div');
+      secDiv.className = 'doc-section';
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'doc-section-title';
+      titleEl.textContent = part;
+      secDiv.appendChild(titleEl);
+
+      // 다음 part가 내용
+      const content = (parts[i + 1] || '').trim();
+      if (content) {
+        // 소항목(가., 나., ①) 처리
+        const subParts = content.split(/(?=\n(?:가\.|나\.|다\.|라\.|마\.|①|②|③|④))/);
+        subParts.forEach(sp => {
+          const spTrim = sp.trim();
+          if (!spTrim) return;
+          const subMatch = spTrim.match(/^(가\.|나\.|다\.|라\.|마\.|①|②|③|④)\s*/);
+          if (subMatch) {
+            const subTitle = document.createElement('div');
+            subTitle.className = 'doc-sub-title';
+            const firstLine = spTrim.split('\n')[0];
+            subTitle.textContent = firstLine;
+            secDiv.appendChild(subTitle);
+            const rest = spTrim.slice(firstLine.length).trim();
+            if (rest) {
+              const p = document.createElement('div');
+              p.className = 'doc-para';
+              p.textContent = rest;
+              secDiv.appendChild(p);
+            }
+          } else {
+            const p = document.createElement('div');
+            p.className = 'doc-para';
+            p.textContent = spTrim;
+            secDiv.appendChild(p);
+          }
+        });
+      }
+      rendered.appendChild(secDiv);
+      i++; // 내용 파트 건너뜀
     }
   }
 
-  // 본문 렌더링
-  const sections = mainText.split(/(?=\n[0-9]+\.\s)/);
-  sections.forEach(sec => {
-    const trimmed = sec.trim();
-    if (!trimmed) return;
-    const titleMatch = trimmed.match(/^([0-9]+\.\s[^\n]+)/);
-    if (titleMatch) {
-      const div = document.createElement('div');
-      div.className = 'doc-section';
-      const titleEl = document.createElement('div');
-      titleEl.className = 'doc-section-title';
-      titleEl.textContent = titleMatch[1].trim();
-      div.appendChild(titleEl);
-      const body = document.createElement('div');
-      body.className = 'doc-para';
-      body.textContent = trimmed.slice(titleMatch[1].length).trim();
-      div.appendChild(body);
-      container.appendChild(div);
-    } else {
-      const p = document.createElement('div');
-      p.className = 'doc-para';
-      p.textContent = trimmed;
-      container.appendChild(p);
-    }
-  });
-
   // 종합결론 표 렌더링
-  if (summaryText) {
+  if (tableRows.length > 0) {
     const secDiv = document.createElement('div');
-    secDiv.className = 'doc-section';
+    secDiv.className = 'doc-section result-section';
 
     const titleEl = document.createElement('div');
     titleEl.className = 'doc-section-title';
-    titleEl.textContent = '4. 종합 검토 결론';
+    titleEl.textContent = '5. 종합 검토 결론';
     secDiv.appendChild(titleEl);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'result-table-wrap';
 
     const table = document.createElement('table');
     table.className = 'result-table';
-    table.innerHTML = '<thead><tr><th>용도</th><th>허용 여부</th><th>근거</th><th>조건</th></tr></thead>';
-    const tbody = document.createElement('tbody');
+    table.innerHTML = `<thead><tr>
+      <th style="width:24%">용도</th>
+      <th style="width:13%">허용 여부</th>
+      <th style="width:35%">법적 근거</th>
+      <th style="width:28%">조건 / 비고</th>
+    </tr></thead>`;
 
-    const entries = summaryText.split(/\n(?=\[)/);
-    entries.forEach(entry => {
-      const lines = entry.trim().split('\n');
-      if (!lines[0]) return;
-      const typeMatch = lines[0].match(/^\[(허용|조건부허용|불허)\]\s*(.*)/);
-      if (!typeMatch) return;
-      const type = typeMatch[1];
-      const name = typeMatch[2].trim();
-      let basis = '', cond = '';
-      lines.forEach(l => {
-        if (l.includes('근거:')) basis = l.replace('근거:', '').trim();
-        if (l.includes('조건:')) cond = l.replace('조건:', '').trim();
-      });
-      const badgeClass = type === '허용' ? 'badge-ok' : type === '조건부허용' ? 'badge-cond' : 'badge-no';
-      const icon = type === '허용' ? '✅' : type === '조건부허용' ? '🔶' : '❌';
+    const tbody = document.createElement('tbody');
+    tableRows.forEach(row => {
+      const cols = row.split('|');
+      if (cols.length < 4) return;
+      const [type, name, basis, cond] = cols.map(c => c.trim());
+      const isOk   = type === '허용';
+      const isCond = type === '조건부';
+      const badgeClass = isOk ? 'badge badge-ok' : isCond ? 'badge badge-cond' : 'badge badge-no';
+      const icon = isOk ? '✅' : isCond ? '🔶' : '❌';
+      const label = isOk ? '허용' : isCond ? '조건부 허용' : '불허';
       const tr = document.createElement('tr');
-      tr.innerHTML = \`<td>\${name}</td><td><span class="\${badgeClass}">\${icon} \${type}</span></td><td>\${basis}</td><td>\${cond}</td>\`;
+      tr.innerHTML = `
+        <td style="font-weight:500">${name}</td>
+        <td><span class="${badgeClass}">${icon} ${label}</span></td>
+        <td style="color:var(--text2);font-size:12px">${basis}</td>
+        <td style="font-size:12px">${cond}</td>`;
       tbody.appendChild(tr);
     });
     table.appendChild(tbody);
-    secDiv.appendChild(table);
-    container.appendChild(secDiv);
+    wrap.appendChild(table);
+    secDiv.appendChild(wrap);
+    rendered.appendChild(secDiv);
   }
 
-  // 최종 의견 블록
-  if (finalText) {
-    const opinDiv = document.createElement('div');
-    opinDiv.className = 'final-opinion';
-    const opinTitle = document.createElement('div');
-    opinTitle.className = 'final-opinion-title';
-    opinTitle.textContent = '◆ 최종 의견';
-    opinDiv.appendChild(opinTitle);
-    const opinBody = document.createElement('div');
-    opinBody.textContent = finalText;
-    opinDiv.appendChild(opinBody);
-    container.appendChild(opinDiv);
+  // 결론 및 권고사항 (afterTable)
+  if (afterTable.trim()) {
+    const afterSections = afterTable.split(/##SECTION:([^#]+)##/);
+    for (let i = 0; i < afterSections.length; i++) {
+      const part = afterSections[i].trim();
+      if (!part) continue;
+      if (i % 2 === 1) {
+        const secDiv = document.createElement('div');
+        secDiv.className = 'doc-section';
+        const titleEl = document.createElement('div');
+        titleEl.className = 'doc-section-title';
+        titleEl.textContent = part;
+        secDiv.appendChild(titleEl);
+        const content = (afterSections[i + 1] || '').trim();
+        if (content) {
+          const box = document.createElement('div');
+          box.className = 'final-box';
+          const boxTitle = document.createElement('div');
+          boxTitle.className = 'final-box-title';
+          boxTitle.textContent = '◆ 권고사항';
+          box.appendChild(boxTitle);
+          const boxBody = document.createElement('div');
+          boxBody.className = 'final-box-body';
+          boxBody.textContent = content;
+          box.appendChild(boxBody);
+          secDiv.appendChild(box);
+        }
+        rendered.appendChild(secDiv);
+        i++;
+      }
+    }
   }
 }
 
+/* ── 생성 ── */
 async function generate() {
   if (busy) return;
   busy = true;
+  fullText = '';
 
   const btn = document.getElementById('genBtn');
   btn.disabled = true;
@@ -636,19 +512,27 @@ async function generate() {
   const payload = {
     docType: currentType,
     docTitle: g('docTitle'), client: g('client'), agency: g('agency'),
-    docDate: g('docDate'), author: g('author'), location: g('location'),
-    zoning: g('zoning'), area: g('area'), law: g('law'),
+    docDate: g('docDate'), author: g('author'),
+    location: g('location'), zoning: g('zoning'),
+    zoneDistrict: g('zoneDistrict'), nearbyZoning: g('nearbyZoning'),
+    nearbyLanduse: g('nearbyLanduse'), area: g('area'), law: g('law'),
     background: g('background'), current: g('current'), extra: g('aiPrompt')
   };
 
   const wrap = document.getElementById('outputWrap');
-  const body = document.getElementById('outputBody');
+  const rawEl = document.getElementById('outputRaw');
+  const rendEl = document.getElementById('outputRendered');
   const prog = document.getElementById('progBar');
 
   wrap.style.display = 'block';
-  body.className = 'output-body';
-  body.textContent = '';
+  rawEl.className = 'output-raw visible';
+  rawEl.textContent = '';
+  rendEl.className = 'output-rendered';
+  rendEl.innerHTML = '';
   prog.style.display = 'block';
+
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
 
   try {
     const res = await fetch('/api/generate', {
@@ -663,9 +547,7 @@ async function generate() {
     }
 
     prog.style.display = 'none';
-    const cursor = document.createElement('span');
-    cursor.className = 'cursor';
-    body.appendChild(cursor);
+    rawEl.appendChild(cursor);
 
     const reader = res.body.getReader();
     const dec = new TextDecoder();
@@ -683,23 +565,30 @@ async function generate() {
         if (!raw || raw === '[DONE]') continue;
         try {
           const parsed = JSON.parse(raw);
-          // OpenAI 호환(Groq) SSE 포맷
           const txt = parsed?.choices?.[0]?.delta?.content;
           if (txt) {
-            body.insertBefore(document.createTextNode(txt), cursor);
-            body.scrollTop = body.scrollHeight;
+            fullText += txt;
+            rawEl.insertBefore(document.createTextNode(txt), cursor);
+            rawEl.scrollTop = rawEl.scrollHeight;
           }
         } catch (_) {}
       }
     }
+
     cursor.remove();
-    renderOutput(body);
+
+    // 스트리밍 완료 → 렌더링
+    rawEl.className = 'output-raw';
+    rendEl.className = 'output-rendered visible';
+    renderDoc(fullText);
     showToast('✓ 검토서 초안 생성 완료');
 
   } catch (e) {
     prog.style.display = 'none';
-    body.className = 'output-body error';
-    body.textContent = '오류: ' + e.message;
+    cursor.remove();
+    rawEl.className = 'output-raw visible';
+    rawEl.style.color = 'var(--red)';
+    rawEl.textContent = '오류: ' + e.message;
   } finally {
     busy = false;
     btn.disabled = false;
